@@ -30,24 +30,24 @@ class PreferencesManager(context: Context) {
         editor.apply()
     }
 
-    fun getMatricula(): String? {
-        return sharedPreferences.getString(KEY_MATRICULA,"") ?: ""
+    fun getMatricula(): String {
+        return sharedPreferences.getString(KEY_MATRICULA, "") ?: ""
     }
 
-    fun getNombre(): String? {
-        return sharedPreferences.getString(KEY_NOMBRE,"") ?: ""
+    fun getNombre(): String {
+        return sharedPreferences.getString(KEY_NOMBRE, "") ?: ""
     }
 
-    fun getCarrera(): String? {
-        return sharedPreferences.getString(KEY_CARRERA,"") ?: ""
+    fun getCarrera(): String {
+        return sharedPreferences.getString(KEY_CARRERA, "") ?: ""
     }
 
-    fun getTurno(): String? {
-        return sharedPreferences.getString(KEY_TURNO,"") ?: ""
+    fun getTurno(): String {
+        return sharedPreferences.getString(KEY_TURNO, "Matutino") ?: "Matutino"
     }
 
     fun getActivo(): Boolean {
-        return sharedPreferences.getBoolean(KEY_ACTIVO, false)
+        return sharedPreferences.getBoolean(KEY_ACTIVO, true)
     }
 
     fun clearPreferenias() {

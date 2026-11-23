@@ -1,4 +1,4 @@
-package com.example.miniproyecto01.data
+package com.example.miniproyecto01
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
