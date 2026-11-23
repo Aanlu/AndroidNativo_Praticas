@@ -62,7 +62,6 @@ fun ConfirmScreen(
             Text("Nombre: $nombre", fontSize = 18.sp)
             Text("Carrera: $carrera", fontSize = 18.sp)
             Text("Turno: $turno", fontSize = 18.sp)
-            Text("Activo: $activo", fontSize = 18.sp)
             Text(
                 text = "Estatus: " + if (activo) "Activo" else "Inactivo",
                 fontSize = 18.sp,
