@@ -10,7 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -44,11 +51,84 @@ fun MainScreen() {
     val tareas by dao.obtenerTodas().collectAsState(initial = emptyList())
 
     var nuevoTitulo by remember { mutableStateOf("") }
+    var menuExpandido by remember { mutableStateOf(false) }
+    var filtro by remember { mutableStateOf("Todas") }
+    var orden by remember { mutableStateOf("Fecha") }
+
+    val tareasFiltradas = when (filtro) {
+        "Pendientes" -> tareas.filter { !it.completada }
+        "Completadas" -> tareas.filter { it.completada }
+        else -> tareas
+    }
+
+    val tareasVisibles = if (orden == "Estado") {
+        tareasFiltradas.sortedBy { it.completada }
+    } else {
+        tareasFiltradas.sortedByDescending { it.fecha }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Mis Tareas") },
+                actions = {
+                    IconButton(onClick = { menuExpandido = true }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Más opciones")
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpandido,
+                        onDismissRequest = { menuExpandido = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Mostrar todas") },
+                            onClick = {
+                                filtro = "Todas"
+                                menuExpandido = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Mostrar pendientes") },
+                            onClick = {
+                                filtro = "Pendientes"
+                                menuExpandido = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Mostrar completadas") },
+                            onClick = {
+                                filtro = "Completadas"
+                                menuExpandido = false
+                            }
+                        )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text("Ordenar por fecha") },
+                            onClick = {
+                                orden = "Fecha"
+                                menuExpandido = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Ordenar por estado") },
+                            onClick = {
+                                orden = "Estado"
+                                menuExpandido = false
+                            }
+                        )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text("Borrar completadas") },
+                            onClick = {
+                                menuExpandido = false
+                                Toast.makeText(context, "Tareas completadas eliminadas", Toast.LENGTH_SHORT).show()
+                                scope.launch(Dispatchers.IO) {
+                                    dao.eliminarCompletadas()
+                                }
+                            }
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -90,12 +170,19 @@ fun MainScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (tareas.isEmpty()) {
+            Text(
+                text = "Filtro: $filtro | Orden: $orden",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (tareasVisibles.isEmpty()) {
                 Text("No hay tareas para mostrar")
             }
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(tareas) { tarea ->
+                items(tareasVisibles) { tarea ->
                     TareaItem(
                         tarea = tarea,
                         onCompletadaChange = { marcada ->
