@@ -1,6 +1,9 @@
 package com.example.practica10
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -16,7 +19,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +33,18 @@ fun CamaraScreen() {
     ) { bitmap: Bitmap? ->
         if (bitmap != null) {
             listaImagenes = listaImagenes + bitmap
+        }
+    }
+
+    val context = LocalContext.current
+
+    val permisoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { concedido: Boolean ->
+        if (concedido) {
+            camaraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -44,7 +61,16 @@ fun CamaraScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    camaraLauncher.launch(null)
+                    val tienePermiso = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (tienePermiso) {
+                        camaraLauncher.launch(null)
+                    } else {
+                        permisoLauncher.launch(Manifest.permission.CAMERA)
+                    }
                 }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Tomar Foto")
