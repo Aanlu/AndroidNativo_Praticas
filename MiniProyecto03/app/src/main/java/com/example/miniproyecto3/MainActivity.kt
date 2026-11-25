@@ -4,44 +4,35 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.miniproyecto3.ui.theme.MiniProyecto3Theme
+import androidx.activity.viewModels
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.miniproyecto3.presentation.FormularioScreen
+import com.example.miniproyecto3.presentation.ListaScreen
+import com.example.miniproyecto3.presentation.PublicacionViewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: PublicacionViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MiniProyecto3Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            val navController = rememberNavController()
+
+            NavHost(navController = navController, startDestination = "lista") {
+                composable("lista") {
+                    ListaScreen(viewModel) {
+                        navController.navigate("formulario")
+                    }
+                }
+                composable("formulario") {
+                    FormularioScreen(viewModel) {
+                        navController.popBackStack()
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MiniProyecto3Theme {
-        Greeting("Android")
     }
 }
